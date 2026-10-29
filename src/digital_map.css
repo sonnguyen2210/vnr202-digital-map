@@ -700,6 +700,82 @@
   color: #334155;
 }
 
+/* ========================================================
+   NHÃN CHỦ QUYỀN BIỂN ĐÔNG (VIỆT NAM)
+   ======================================================== */
+.sovereign-sea-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.9) !important;
+  border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
+  border-radius: 24px !important;
+  padding: 6px 18px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), 0 0 15px rgba(245, 158, 11, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.sea-badge-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sea-emblem-star {
+  font-size: 18px;
+  color: var(--c-gold-bright);
+  line-height: 1;
+  text-shadow: 0 0 6px rgba(245, 158, 11, 0.8);
+}
+
+.sea-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sea-main-title {
+  font-family: var(--font-heading), 'Playfair Display', Georgia, serif;
+  font-size: 14.5px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #fef08a;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.sea-sub-title {
+  font-family: var(--font-main);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #e2e8f0;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+
+[data-theme="light"] .sovereign-sea-badge {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1.5px solid rgba(185, 28, 28, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 0 12px rgba(185, 28, 28, 0.15) !important;
+}
+
+[data-theme="light"] .sea-main-title {
+  color: #b91c1c;
+}
+
+[data-theme="light"] .sea-sub-title {
+  color: #334155;
+}
+
+/* Lớp hiệu ứng bản đồ Cổ điển dã chiến thuần Việt */
+.vintage-basemap-layer {
+  filter: sepia(0.65) contrast(1.12) brightness(0.96) saturate(0.85);
+}
+
 
 
 /* ========================================================
@@ -2345,10 +2421,15 @@
     font-size: 11px;
   }
 
-  /* Nhãn chủ quyền Hoàng Sa & Trường Sa */
+  /* Nhãn chủ quyền Hoàng Sa, Trường Sa & Biển Đông */
   .custom-island-marker-wrapper .sovereign-island-label {
     transform: scale(0.85);
     transform-origin: top left;
+  }
+
+  .custom-sea-marker-wrapper .sovereign-sea-badge {
+    transform: scale(0.85);
+    transform-origin: center center;
   }
 
   /* Nhãn tên địa danh nổi cạnh Marker */
@@ -2489,6 +2570,11 @@
   .custom-island-marker-wrapper .sovereign-island-label {
     transform: scale(0.72);
     transform-origin: top left;
+  }
+
+  .custom-sea-marker-wrapper .sovereign-sea-badge {
+    transform: scale(0.72);
+    transform-origin: center center;
   }
 
   .pin-floating-tag {

@@ -239,14 +239,23 @@ const historicalEvents = [
   }
 ];
 
-// Cấu hình các lớp bản đồ miễn phí, tải tức thì, không cần API key
+// Cấu hình các lớp bản đồ chuẩn địa danh tiếng Việt & khẳng định chủ quyền lãnh thổ
 const BASEMAP_OPTIONS = {
+  streets: {
+    id: 'streets',
+    label: 'Địa chính',
+    icon: '🗺️',
+    desc: 'Bản đồ giao thông & địa giới chuẩn tiếng Việt',
+    url: 'https://mt1.google.com/vt/lyrs=m&hl=vi&gl=VN&x={x}&y={y}&z={z}',
+    maxZoom: 18,
+    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+  },
   terrain: {
     id: 'terrain',
     label: 'Địa hình',
     icon: '🏔️',
-    desc: 'Bản đồ địa hình chiến khu & đồi núi',
-    url: 'https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
+    desc: 'Bản đồ địa hình chiến khu & đồi núi chuẩn tiếng Việt',
+    url: 'https://mt1.google.com/vt/lyrs=p&hl=vi&gl=VN&x={x}&y={y}&z={z}',
     maxZoom: 18,
     subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
   },
@@ -254,17 +263,8 @@ const BASEMAP_OPTIONS = {
     id: 'satellite',
     label: 'Vệ tinh',
     icon: '🛰️',
-    desc: 'Ảnh vệ tinh chụp toàn cảnh thực tế',
-    url: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
-    maxZoom: 18,
-    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-  },
-  streets: {
-    id: 'streets',
-    label: 'Địa chính',
-    icon: '🗺️',
-    desc: 'Bản đồ giao thông & địa giới rõ nét',
-    url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+    desc: 'Ảnh vệ tinh thực địa chuẩn địa danh tiếng Việt',
+    url: 'https://mt1.google.com/vt/lyrs=y&hl=vi&gl=VN&x={x}&y={y}&z={z}',
     maxZoom: 18,
     subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
   },
@@ -272,10 +272,11 @@ const BASEMAP_OPTIONS = {
     id: 'vintage',
     label: 'Cổ điển',
     icon: '📜',
-    desc: 'Bản đồ tư liệu địa lý Atlas phong cách cổ',
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+    desc: 'Bản đồ tư liệu dã chiến phong cách lịch sử chuẩn tiếng Việt',
+    url: 'https://mt1.google.com/vt/lyrs=p&hl=vi&gl=VN&x={x}&y={y}&z={z}',
+    className: 'vintage-basemap-layer',
     maxZoom: 18,
-    subdomains: []
+    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
   }
 };
 
@@ -365,11 +366,12 @@ export default function HistoricalMap() {
 
     L.control.zoom({ position: isMobile ? 'topright' : 'bottomright' }).addTo(map);
 
-    // Lớp tile bản đồ mặc định
-    const currentCfg = BASEMAP_OPTIONS[activeBasemap] || BASEMAP_OPTIONS.terrain;
+    // Lớp tile bản đồ mặc định (100% chuẩn địa danh tiếng Việt)
+    const currentCfg = BASEMAP_OPTIONS[activeBasemap] || BASEMAP_OPTIONS.streets;
     const initialTileLayer = L.tileLayer(currentCfg.url, {
-      attribution: '&copy; Google Maps / Bản đồ số Lịch sử',
+      attribution: '&copy; Bản đồ số Lịch sử Việt Nam (1939 - 1945)',
       subdomains: currentCfg.subdomains.length ? currentCfg.subdomains : 'abc',
+      className: currentCfg.className || '',
       maxZoom: currentCfg.maxZoom
     }).addTo(map);
 
@@ -391,12 +393,12 @@ export default function HistoricalMap() {
           ${vietnamFlagSvg}
           <div class="island-info">
             <strong class="island-title">QUẦN ĐẢO HOÀNG SA</strong>
-            <span class="island-sub">Huyện Hoàng Sa • TP. Đà Nẵng</span>
+            <span class="island-sub">Huyện Hoàng Sa • TP. Đà Nẵng (Việt Nam)</span>
           </div>
         </div>
       `,
-      iconSize: [260, 42],
-      iconAnchor: [12, 21]
+      iconSize: [270, 44],
+      iconAnchor: [135, 22]
     });
 
     // Nhãn chủ quyền Trường Sa (Lá cờ + Tên địa danh)
@@ -407,16 +409,35 @@ export default function HistoricalMap() {
           ${vietnamFlagSvg}
           <div class="island-info">
             <strong class="island-title">QUẦN ĐẢO TRƯỜNG SA</strong>
-            <span class="island-sub">Huyện Trường Sa • Tỉnh Khánh Hòa</span>
+            <span class="island-sub">Huyện Trường Sa • Tỉnh Khánh Hòa (Việt Nam)</span>
           </div>
         </div>
       `,
-      iconSize: [260, 42],
-      iconAnchor: [12, 21]
+      iconSize: [270, 44],
+      iconAnchor: [135, 22]
     });
 
-    L.marker([16.7, 112.5], { icon: hoangSaBadge, interactive: false }).addTo(map);
-    L.marker([10.4, 114.2], { icon: truongSaBadge, interactive: false }).addTo(map);
+    // Nhãn chủ quyền Biển Đông Việt Nam
+    const bienDongBadge = L.divIcon({
+      className: 'custom-sea-marker-wrapper',
+      html: `
+        <div class="sovereign-sea-badge">
+          <div class="sea-badge-inner">
+            <span class="sea-emblem-star">★</span>
+            <div class="sea-text-block">
+              <span class="sea-main-title">BIỂN ĐÔNG</span>
+              <span class="sea-sub-title">VÙNG BIỂN CHỦ QUYỀN VIỆT NAM</span>
+            </div>
+          </div>
+        </div>
+      `,
+      iconSize: [290, 48],
+      iconAnchor: [145, 24]
+    });
+
+    L.marker([16.5, 112.0], { icon: hoangSaBadge, interactive: false, zIndexOffset: 900 }).addTo(map);
+    L.marker([10.0, 114.2], { icon: truongSaBadge, interactive: false, zIndexOffset: 900 }).addTo(map);
+    L.marker([14.5, 112.2], { icon: bienDongBadge, interactive: false, zIndexOffset: 850 }).addTo(map);
 
     markersLayerRef.current = L.layerGroup().addTo(map);
 
@@ -449,10 +470,11 @@ export default function HistoricalMap() {
     if (tileLayerRef.current) {
       mapInstanceRef.current.removeLayer(tileLayerRef.current);
     }
-    const currentCfg = BASEMAP_OPTIONS[activeBasemap] || BASEMAP_OPTIONS.terrain;
+    const currentCfg = BASEMAP_OPTIONS[activeBasemap] || BASEMAP_OPTIONS.streets;
     const newLayer = L.tileLayer(currentCfg.url, {
-      attribution: '&copy; Google / Esri / Bản đồ số Lịch sử',
+      attribution: '&copy; Bản đồ số Lịch sử Việt Nam (1939 - 1945)',
       subdomains: currentCfg.subdomains.length ? currentCfg.subdomains : 'abc',
+      className: currentCfg.className || '',
       maxZoom: currentCfg.maxZoom
     }).addTo(mapInstanceRef.current);
 
