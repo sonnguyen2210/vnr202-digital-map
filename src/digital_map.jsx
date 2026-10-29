@@ -420,13 +420,22 @@ export default function HistoricalMap() {
 
     markersLayerRef.current = L.layerGroup().addTo(map);
 
-    const handleResize = () => map.invalidateSize();
+    const handleResize = () => {
+      map.invalidateSize();
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      }, 250);
+    };
     window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
 
     mapInstanceRef.current = map;
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
@@ -785,7 +794,7 @@ export default function HistoricalMap() {
         </button>
 
         <div className="dock-scroll-track" ref={timelineRef}>
-          {filteredEvents.map((ev, idx) => {
+          {filteredEvents.map((ev) => {
             const isCurrent = selectedEvent?.id === ev.id;
             const originalIndex = historicalEvents.findIndex(e => e.id === ev.id) + 1;
             const shortName = ev.title.split('&')[0].split(':')[0].trim();

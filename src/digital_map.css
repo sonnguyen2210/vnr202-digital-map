@@ -56,8 +56,11 @@
 
 .heritage-map-app {
   position: relative;
+  width: 100%;
   width: 100vw;
+  height: 100%;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   font-family: var(--font-main);
   background-color: var(--bg-deep);
@@ -1872,66 +1875,284 @@
 }
 
 /* ========================================================
-   10. RESPONSIVE DESIGN (TABLET & MOBILE)
+   10. HỆ THỐNG RESPONSIVE ĐA THIẾT BỊ HOÀN THIỆN
+   Tối ưu toàn diện cho: Mobile (Portrait & Landscape),
+   Phablet, Tablet (iPad), Laptop & Màn hình lớn (Desktop)
    ======================================================== */
-@media (max-width: 1024px) {
+
+/* Loại bỏ độ trễ cảm ứng 300ms trên thiết bị di động */
+.toolbar-btn,
+.heritage-chip,
+.dock-nav-btn,
+.timeline-milestone-card,
+.step-nav-btn,
+.tab-btn,
+.dialog-close-btn,
+.drawer-close-icon-btn,
+.prompt-confirm-btn,
+.prompt-dismiss-btn {
+  touch-action: manipulation;
+}
+
+/* 10.1. Màn hình Laptop nhỏ & Màn hình máy tính thông thường (<= 1280px) */
+@media (max-width: 1280px) {
   .heritage-detail-drawer {
-    width: 400px;
+    width: 420px;
+    right: -460px;
   }
+
+  .heritage-detail-drawer.is-open {
+    right: 14px;
+  }
+
   .heritage-timeline-dock.has-drawer {
-    right: 420px;
+    right: 444px;
+  }
+
+  .heritage-map-app:has(.heritage-detail-drawer.is-open) .leaflet-bottom.leaflet-right {
+    right: 444px !important;
   }
 }
 
-@media (max-width: 768px) {
+/* 10.2. Màn hình Máy tính bảng ngang & Laptop nhỏ (<= 1024px) */
+@media (max-width: 1024px) {
   .desktop-only {
     display: none !important;
   }
 
   .heritage-navbar {
     top: 10px;
-    left: 10px;
-    right: 10px;
-    padding: 8px 12px;
+    left: 12px;
+    right: 12px;
+    padding: 7px 14px;
+    gap: 10px;
   }
 
   .brand-main-title {
-    font-size: 15px;
+    font-size: 15.5px;
   }
 
   .brand-sub-title {
-    font-size: 10.5px;
+    font-size: 11px;
+  }
+
+  .nav-toolbar-section {
+    gap: 6px;
+  }
+
+  .toolbar-btn {
+    padding: 6px 11px;
+    font-size: 12.5px;
   }
 
   .heritage-filter-ribbon {
-    top: 74px;
-    left: 10px;
+    top: 68px;
+    left: 12px;
   }
 
-  .heritage-timeline-dock {
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
+  .filter-chips-container {
+    max-width: calc(100vw - 24px);
+    gap: 6px;
+    padding: 4px 8px;
   }
 
-  .heritage-timeline-dock.has-drawer {
-    right: 10px;
-    display: none; /* Ẩn timeline khi sidebar mở trên điện thoại */
-  }
-
-  .timeline-milestone-card {
-    flex: 0 0 200px;
-    height: 62px;
+  .heritage-chip {
+    padding: 4px 10px;
+    font-size: 12px;
   }
 
   .heritage-detail-drawer {
+    width: 390px;
+    right: -440px;
+  }
+
+  .heritage-detail-drawer.is-open {
+    right: 12px;
+  }
+
+  .heritage-timeline-dock.has-drawer {
+    right: 414px;
+  }
+
+  .heritage-map-app:has(.heritage-detail-drawer.is-open) .leaflet-bottom.leaflet-right {
+    right: 414px !important;
+  }
+
+  .timeline-milestone-card {
+    flex: 0 0 190px;
+    height: 62px;
+  }
+}
+
+/* 10.3. Màn hình Máy tính bảng dọc & Điện thoại lớn (Tablet Portrait & Large Phones: <= 768px) */
+@media (max-width: 768px) {
+  .btn-label,
+  .dropdown-caret {
+    display: none !important;
+  }
+
+  .heritage-navbar {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    padding: 6px 10px;
+    gap: 8px;
+    border-radius: 12px;
+  }
+
+  .nav-brand-section {
+    gap: 8px;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .national-emblem-badge {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .emblem-star {
+    font-size: 19px;
+  }
+
+  .brand-text-block {
+    min-width: 0;
+  }
+
+  .brand-main-title {
+    font-size: 13.5px;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .brand-sub-title {
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-toolbar-section {
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .toolbar-btn {
+    padding: 6px 8px;
+    min-width: 34px;
+    height: 34px;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+
+  .basemap-menu-popover {
+    right: 0;
+    left: auto;
+    width: min(290px, calc(100vw - 20px));
+    max-height: 65vh;
+    overflow-y: auto;
+  }
+
+  .heritage-filter-ribbon {
+    top: 58px;
+    left: 8px;
+    right: 8px;
+  }
+
+  .filter-chips-container {
+    max-width: 100%;
+    padding: 4px 6px;
+    gap: 5px;
+    border-radius: 10px;
+  }
+
+  .heritage-chip {
+    padding: 4px 8px;
+    font-size: 11.5px;
+    gap: 4px;
+  }
+
+  .chip-count-pill {
+    font-size: 9.5px;
+    padding: 1px 5px;
+  }
+
+  /* Định vị nút zoom Leaflet trên màn hình di động */
+  .leaflet-bottom.leaflet-right {
+    bottom: 78px !important;
+    right: 10px !important;
+  }
+
+  .leaflet-control-zoom a {
+    width: 32px !important;
+    height: 32px !important;
+    line-height: 32px !important;
+    font-size: 16px !important;
+  }
+
+  .heritage-map-app:has(.heritage-detail-drawer.is-open) .leaflet-bottom.leaflet-right {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Dòng thời gian mốc son dưới đáy */
+  .heritage-timeline-dock {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    gap: 4px;
+  }
+
+  .heritage-timeline-dock.has-drawer {
+    display: none !important;
+  }
+
+  .dock-nav-btn {
+    width: 28px;
+    height: 56px;
+    font-size: 18px;
+    border-radius: 8px;
+  }
+
+  .timeline-milestone-card {
+    flex: 0 0 165px;
+    height: 56px;
+    padding: 6px 8px;
+    border-radius: 9px;
+  }
+
+  .order-badge {
+    font-size: 9.5px;
+  }
+
+  .date-badge {
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+
+  .card-title-text {
+    font-size: 11px;
+    line-height: 1.25;
+    -webkit-line-clamp: 2;
+  }
+
+  /* Bảng chi tiết sự kiện mốc son (Sidebar Drawer) dạng Bottom Sheet / Full Screen */
+  .heritage-detail-drawer {
+    position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    width: 100vw;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
     border-radius: 0;
     border: none;
+    z-index: 2000;
     transform: translateY(100%);
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -1939,10 +2160,478 @@
   .heritage-detail-drawer.is-open {
     transform: translateY(0);
     right: 0;
+    left: 0;
+  }
+
+  .drawer-inner-content {
+    padding: 12px 14px 30px 14px;
+    padding-top: max(12px, env(safe-area-inset-top));
+    padding-bottom: max(30px, env(safe-area-inset-bottom));
+    gap: 14px;
+  }
+
+  .drawer-header-strip {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg-panel);
+    padding: 8px 0;
+    margin-top: -4px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-gold-subtle);
+  }
+
+  .drawer-close-icon-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .event-main-title {
+    font-size: 17px;
+    line-height: 1.35;
+  }
+
+  .event-date-callout {
+    font-size: 12px;
+  }
+
+  .drawer-highlight-quote {
+    padding: 10px 12px 10px 24px;
+  }
+
+  .quote-mark {
+    font-size: 22px;
+    left: 6px;
+  }
+
+  .quote-text {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .stats-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .stat-highlight-card {
+    padding: 8px 10px;
+  }
+
+  .stat-value {
+    font-size: 15px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+  .figure-badge {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .step-text-bubble {
+    padding: 8px 10px;
+  }
+
+  .step-text-bubble p {
+    font-size: 11.5px;
+  }
+
+  .drawer-significance-card {
+    padding: 12px;
+  }
+
+  .drawer-significance-card h4 {
+    font-size: 11.5px;
+  }
+
+  .sig-body {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  /* Cửa sổ Modal hồ sơ đề tài & tài liệu */
+  .heritage-modal-backdrop {
+    padding: 10px;
+  }
+
+  .heritage-modal-dialog {
+    max-width: 100%;
+    width: 100%;
+    max-height: 94vh;
+    max-height: 94dvh;
+    border-radius: 12px;
+  }
+
+  .modal-dialog-header {
+    padding: 12px 14px;
+  }
+
+  .dialog-heading {
+    font-size: 14px;
+  }
+
+  .dialog-sub {
+    font-size: 10.5px;
+  }
+
+  .dialog-tab-bar {
+    padding: 2px 8px;
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .dialog-tab-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dialog-tab-bar .tab-btn {
+    padding: 8px 10px;
+    font-size: 11.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .dialog-tab-body {
+    padding: 12px 10px;
+    max-height: calc(94dvh - 110px);
   }
 
   .members-grid-layout {
     grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .member-card {
+    padding: 7px 10px;
+  }
+
+  .member-name {
+    font-size: 12.5px;
+  }
+
+  .member-mssv {
+    font-size: 11px;
+  }
+
+  .project-intro-banner {
+    padding: 10px 12px;
+  }
+
+  .project-intro-banner h4 {
+    font-size: 12.5px;
+  }
+
+  .project-intro-banner p {
+    font-size: 11.5px;
+  }
+
+  .chapter-box {
+    padding: 10px;
+  }
+
+  .chapter-title {
+    font-size: 12.5px;
+  }
+
+  .chapter-text,
+  .target-sub-point {
+    font-size: 11px;
+  }
+
+  /* Nhãn chủ quyền Hoàng Sa & Trường Sa */
+  .custom-island-marker-wrapper .sovereign-island-label {
+    transform: scale(0.85);
+    transform-origin: top left;
+  }
+
+  /* Nhãn tên địa danh nổi cạnh Marker */
+  .pin-floating-tag {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 5px;
+  }
+}
+
+/* 10.4. Màn hình Điện thoại di động tiêu chuẩn (Phones: <= 480px) */
+@media (max-width: 480px) {
+  .heritage-navbar {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    padding: 5px 8px;
+    gap: 6px;
+    border-radius: 10px;
+  }
+
+  .national-emblem-badge {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+  }
+
+  .emblem-star {
+    font-size: 17px;
+  }
+
+  .brand-main-title {
+    font-size: 12px;
+    letter-spacing: 0.2px;
+    max-width: calc(100vw - 195px);
+  }
+
+  .brand-sub-title {
+    display: none;
+  }
+
+  .nav-toolbar-section {
+    gap: 4px;
+  }
+
+  .toolbar-btn {
+    padding: 4px 6px;
+    min-width: 30px;
+    height: 30px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  .toolbar-btn .btn-icon {
+    font-size: 13px;
+  }
+
+  .basemap-menu-popover {
+    width: min(270px, calc(100vw - 16px));
+    font-size: 12px;
+  }
+
+  .heritage-filter-ribbon {
+    top: 49px;
+    left: 6px;
+    right: 6px;
+  }
+
+  .filter-chips-container {
+    padding: 3px 5px;
+    gap: 4px;
+    border-radius: 8px;
+  }
+
+  .heritage-chip {
+    padding: 3px 7px;
+    font-size: 11px;
+    gap: 3px;
+    border-radius: 14px;
+  }
+
+  .chip-symbol {
+    font-size: 11px;
+  }
+
+  .chip-count-pill {
+    font-size: 9px;
+    padding: 0 4px;
+  }
+
+  .leaflet-bottom.leaflet-right {
+    bottom: 68px !important;
+    right: 6px !important;
+  }
+
+  .leaflet-control-zoom a {
+    width: 28px !important;
+    height: 28px !important;
+    line-height: 28px !important;
+    font-size: 14px !important;
+  }
+
+  .heritage-timeline-dock {
+    left: 6px;
+    right: 6px;
+    bottom: 6px;
+    gap: 3px;
+  }
+
+  .dock-nav-btn {
+    width: 24px;
+    height: 50px;
+    font-size: 16px;
+    border-radius: 6px;
+  }
+
+  .timeline-milestone-card {
+    flex: 0 0 140px;
+    height: 50px;
+    padding: 4px 6px;
+    border-radius: 7px;
+  }
+
+  .order-badge {
+    font-size: 8.5px;
+  }
+
+  .date-badge {
+    font-size: 8.5px;
+    padding: 1px 4px;
+  }
+
+  .card-title-text {
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .custom-island-marker-wrapper .sovereign-island-label {
+    transform: scale(0.72);
+    transform-origin: top left;
+  }
+
+  .pin-floating-tag {
+    display: none;
+  }
+
+  .event-main-title {
+    font-size: 15.5px;
+  }
+
+  .stats-cards-grid {
+    gap: 6px;
+  }
+
+  .stat-value {
+    font-size: 13.5px;
+  }
+
+  .dialog-heading {
+    font-size: 12.5px;
+  }
+
+  .dialog-sub {
+    font-size: 9.5px;
+  }
+
+  .heritage-audio-prompt-card {
+    padding: 20px 16px;
+    border-radius: 14px;
+    max-width: min(380px, 92vw);
+  }
+
+  .prompt-header-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .prompt-title {
+    font-size: 15px;
+  }
+
+  .prompt-desc {
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  .prompt-confirm-btn {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .prompt-dismiss-btn {
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+}
+
+/* 10.5. Màn hình Điện thoại siêu nhỏ / Gập (Fold / Extra Small Phones: <= 360px) */
+@media (max-width: 360px) {
+  .heritage-navbar {
+    padding: 4px 5px;
+    gap: 4px;
+  }
+
+  .national-emblem-badge {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+  }
+
+  .emblem-star {
+    font-size: 14px;
+  }
+
+  .brand-main-title {
+    font-size: 11px;
+    max-width: calc(100vw - 170px);
+  }
+
+  .nav-toolbar-section {
+    gap: 3px;
+  }
+
+  .toolbar-btn {
+    min-width: 27px;
+    height: 27px;
+    padding: 2px 4px;
+    font-size: 11px;
+  }
+
+  .timeline-milestone-card {
+    flex: 0 0 125px;
+    height: 48px;
+  }
+}
+
+/* 10.6. Tối ưu hóa khi xoay ngang điện thoại (Landscape Mode: max-height <= 520px) */
+@media (max-height: 520px) and (orientation: landscape) {
+  .heritage-navbar {
+    top: 4px;
+    left: 8px;
+    right: 8px;
+    padding: 4px 10px;
+  }
+
+  .brand-sub-title {
+    display: none;
+  }
+
+  .heritage-filter-ribbon {
+    top: 44px;
+    left: 8px;
+    right: 8px;
+  }
+
+  .heritage-timeline-dock {
+    bottom: 4px;
+    left: 8px;
+    right: 8px;
+  }
+
+  .dock-nav-btn {
+    height: 44px;
+  }
+
+  .timeline-milestone-card {
+    height: 44px;
+    flex: 0 0 150px;
+  }
+
+  .leaflet-bottom.leaflet-right {
+    bottom: 54px !important;
+  }
+
+  .heritage-modal-dialog {
+    max-height: 96vh;
+    max-height: 96dvh;
+  }
+
+  .dialog-tab-body {
+    max-height: calc(96dvh - 90px);
   }
 }
 
