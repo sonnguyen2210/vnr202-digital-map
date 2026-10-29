@@ -1,0 +1,342 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>Báo Cáo Thuyết Minh Sản Phẩm Sáng Tạo VNR202</title>
+<style>
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 13pt;
+    line-height: 1.4;
+    color: #111111;
+    margin: 2.5cm;
+  }
+  .header-box {
+    text-align: center;
+    border-bottom: 2px solid #b91c1c;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+  }
+  .school-title {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #b91c1c;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .dept-title {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #333333;
+    margin-bottom: 15px;
+  }
+  .main-title {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #991b1b;
+    text-transform: uppercase;
+    margin: 15px 0 8px 0;
+  }
+  .sub-title {
+    font-size: 14pt;
+    font-style: italic;
+    color: #4b5563;
+    margin-bottom: 15px;
+  }
+  .meta-table {
+    width: 100%;
+    margin-top: 15px;
+    border: none;
+  }
+  .meta-table td {
+    padding: 4px 8px;
+    font-size: 12pt;
+  }
+  h2 {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #991b1b;
+    border-left: 5px solid #b91c1c;
+    padding-left: 10px;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  h3 {
+    font-size: 13pt;
+    font-weight: bold;
+    color: #1f2937;
+    margin-top: 15px;
+    margin-bottom: 6px;
+  }
+  p, li {
+    font-size: 12.5pt;
+    text-align: justify;
+    line-height: 1.5;
+  }
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+  }
+  table.data-table th {
+    background-color: #991b1b;
+    color: #ffffff;
+    font-weight: bold;
+    padding: 8px 10px;
+    border: 1px solid #7f1d1d;
+    font-size: 11.5pt;
+    text-align: center;
+  }
+  table.data-table td {
+    padding: 7px 10px;
+    border: 1px solid #cbd5e1;
+    font-size: 11.5pt;
+  }
+  table.data-table tr:nth-child(even) {
+    background-color: #f8fafc;
+  }
+  .highlight-box {
+    background-color: #fef2f2;
+    border: 1px solid #f87171;
+    border-radius: 6px;
+    padding: 12px 15px;
+    margin: 15px 0;
+  }
+  .footer-sig {
+    margin-top: 40px;
+    float: right;
+    text-align: center;
+    width: 300px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header-box">
+  <div class="school-title">TRƯỜNG ĐẠI HỌC FPT</div>
+  <div class="dept-title">BỘ MÔN LÝ LUẬN CHÍNH TRỊ — HỌC PHẦN: VNR202</div>
+  <div class="main-title">BÁO CÁO THUYẾT MINH SẢN PHẨM SÁNG TẠO</div>
+  <div class="sub-title">Đề tài: BẢN ĐỒ SỐ ĐỊA DANH PHONG TRÀO GIẢI PHÓNG DÂN TỘC (1939 – 1945)</div>
+  
+  <table class="meta-table">
+    <tr>
+      <td width="30%"><strong>Môn học:</strong></td>
+      <td>Lịch sử Đảng Cộng sản Việt Nam (Mã môn: VNR202)</td>
+    </tr>
+    <tr>
+      <td><strong>Giảng viên hướng dẫn:</strong></td>
+      <td><strong>Thầy Kiều Văn Nam</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Nhóm thực hiện:</strong></td>
+      <td><strong>Nhóm 6 (11 thành viên)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Năm học:</strong></td>
+      <td>2026 – 2027</td>
+    </tr>
+  </table>
+</div>
+
+<h2>DANH SÁCH THÀNH VIÊN NHÓM 6 VÀ PHÂN CÔNG NHIỆM VỤ</h2>
+<table class="data-table">
+  <thead>
+    <tr>
+      <th width="8%">STT</th>
+      <th width="18%">Mã sinh viên (MSSV)</th>
+      <th width="28%">Họ và tên</th>
+      <th>Nhiệm vụ & Đóng góp trong dự án</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center">01</td>
+      <td align="center"><strong>HA173007</strong></td>
+      <td><strong>Nông Khánh Ly</strong></td>
+      <td>Trưởng nhóm; Điều phối dự án, biên tập nội dung lịch sử & tổng hợp báo cáo.</td>
+    </tr>
+    <tr>
+      <td align="center">02</td>
+      <td align="center"><strong>HA176019</strong></td>
+      <td><strong>Hà Kiều Nương</strong></td>
+      <td>Nghiên cứu giáo trình VNR202, xây dựng cấu trúc nội dung bám sát Chương 1.</td>
+    </tr>
+    <tr>
+      <td align="center">03</td>
+      <td align="center"><strong>HS170496</strong></td>
+      <td><strong>Nguyễn Minh Hiếu</strong></td>
+      <td>Lập trình Front-end React, tích hợp hệ thống bản đồ số Leaflet & điều phối sự kiện.</td>
+    </tr>
+    <tr>
+      <td align="center">04</td>
+      <td align="center"><strong>HS180378</strong></td>
+      <td><strong>Dương Thị Như Quỳnh</strong></td>
+      <td>Thiết kế giao diện người dùng (UI/UX), chuẩn hóa bảng màu Heritage Light/Dark.</td>
+    </tr>
+    <tr>
+      <td align="center">05</td>
+      <td align="center"><strong>HS181003</strong></td>
+      <td><strong>Nguyễn Trần Mai Phương</strong></td>
+      <td>Thu thập, thẩm định tọa độ địa lý 11 mốc son lịch sử trên bản đồ GIS.</td>
+    </tr>
+    <tr>
+      <td align="center">06</td>
+      <td align="center"><strong>HS186181</strong></td>
+      <td><strong>Trần Thục Quyên</strong></td>
+      <td>Sưu tầm nguồn tư liệu đa phương tiện (video VTV, Báo Nhân Dân, PT-TH Lạng Sơn).</td>
+    </tr>
+    <tr>
+      <td align="center">07</td>
+      <td align="center"><strong>HE190810</strong></td>
+      <td><strong>Nguyễn Hữu Long</strong></td>
+      <td>Lập trình tính năng dòng thời gian (Timeline Dock), bộ lọc chuyên đề & Auto Tour.</td>
+    </tr>
+    <tr>
+      <td align="center">08</td>
+      <td align="center"><strong>HS180642</strong></td>
+      <td><strong>Nguyễn Thị Thuỳ Trang</strong></td>
+      <td>Biên soạn bài học lịch sử, phân tích ý nghĩa từng mốc son theo văn kiện Đảng.</td>
+    </tr>
+    <tr>
+      <td align="center">09</td>
+      <td align="center"><strong>HS180737</strong></td>
+      <td><strong>Nguyễn Thị Thu</strong></td>
+      <td>Thiết kế biểu tượng chủ quyền biển đảo (Hoàng Sa, Trường Sa) & tối ưu hóa hiển thị.</td>
+    </tr>
+    <tr>
+      <td align="center">10</td>
+      <td align="center"><strong>HS186211</strong></td>
+      <td><strong>Trần Thị Thanh Hiền</strong></td>
+      <td>Kiểm thử chức năng (QA/QC), kiểm tra tính chính xác của dữ liệu lịch sử.</td>
+    </tr>
+    <tr>
+      <td align="center">11</td>
+      <td align="center"><strong>HS181177</strong></td>
+      <td><strong>Vũ Thu Hà</strong></td>
+      <td>Chuẩn bị slide thuyết trình, kịch bản demo và triển khai ứng dụng (Deployment).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>PHẦN I: LÝ DO CHỌN ĐỀ TÀI & TÍNH CẤP THIẾT</h2>
+<p>Học phần <strong>Lịch sử Đảng Cộng sản Việt Nam (VNR202)</strong> là môn học lý luận chính trị cơ bản trong khung chương trình của Đại học FPT, trang bị cho sinh viên thế giới quan khoa học, niềm tin và sự thấu hiểu sâu sắc đối với các bước ngoặt phát triển của đất nước dưới sự lãnh đạo của Đảng.</p>
+<p>Tuy nhiên, do tính chất khối lượng sự kiện và nhân vật lịch sử rất phong phú, việc ghi nhớ theo cách đọc giáo trình chữ truyền thống thường gây khô khan và khó hình dung được sự tương quan không gian địa lý. Xuất phát từ thực tế đó, Nhóm 6 xây dựng sản phẩm <strong>"Bản đồ số địa danh phong tràu giải phóng dân tộc (1939 – 1945)"</strong> nhằm ứng dụng công nghệ GIS và dữ liệu đa phương tiện để đổi mới phương thức học tập, giúp sinh viên FPT "du hành thời gian" và tiếp thu bài học một cách tự nhiên, hào hứng.</p>
+
+<h2>PHẦN II: VỊ TRÍ ĐỀ TÀI TRONG MÔN HỌC VNR202</h2>
+<p>Chương trình chuẩn môn học VNR202 tại Đại học FPT bao gồm 1 chương nhập môn và 3 chương nội dung:</p>
+<ul>
+  <li><strong>Nhập môn:</strong> Đối tượng, chức năng, nhiệm vụ và phương pháp nghiên cứu môn học.</li>
+  <li><strong>Chương 1 (1930 – 1945):</strong> Đảng ra đời và lãnh đạo đấu tranh giành chính quyền.</li>
+  <li><strong>Chương 2 (1945 – 1975):</strong> Đảng lãnh đạo hai cuộc kháng chiến chống Pháp và chống Mỹ.</li>
+  <li><strong>Chương 3 (1975 – nay):</strong> Đảng lãnh đạo cả nước đi lên CNXH và công cuộc Đổi mới.</li>
+</ul>
+
+<div class="highlight-box">
+  <strong>Vị trí trọng tâm của dự án:</strong> Đề tài của Nhóm 6 tập trung trực tiếp và toàn diện vào <strong>Mục II – Chương 1: Phong trào giải phóng dân tộc (1939 – 1945) và Cách mạng Tháng Tám toàn thắng</strong>.
+</div>
+
+<p><strong>Tại sao giai đoạn 1939 – 1945 là đề tài lý tưởng nhất cho Bản đồ số?</strong></p>
+<p>1. <em>Sự chuyển dịch không gian chiến lược của Đảng:</em> Đây là thời kỳ Đảng thực hiện chuyển hướng chiến lược, rút về xây dựng căn cứ địa bí mật ở vùng núi và nông thôn (Pác Bó, Tân Trào, ATK Định Hóa...) để tạo thế và lực, sau đó mở rộng mạng lưới vũ trang trên cả 3 miền.</p>
+<p>2. <em>Tính liên kết toàn quốc và nghệ thuật chớp thời cơ:</em> Từ các cuộc khởi nghĩa bước đầu ở Bắc Kỳ (Bắc Sơn), Nam Kỳ (Hóc Môn), Trung Kỳ (Đô Lương), Đảng đã dẫn dắt toàn dân chớp thời cơ ngàn năm có một khi Nhật đầu hàng Đồng minh, tiến hành Tổng khởi nghĩa giải phóng đồng loạt Hà Nội, Huế, Sài Gòn. Chỉ có bản đồ số mới thể hiện được nhịp độ và không gian chiến lược tuyệt vời này.</p>
+
+<h2>PHẦN III: 11 MỐC SON LỊCH SỬ ĐƯỢC SỐ HÓA TRÊN HỆ THỐNG</h2>
+<table class="data-table">
+  <thead>
+    <tr>
+      <th width="8%">Mốc</th>
+      <th width="15%">Thời gian</th>
+      <th width="28%">Địa danh & Sự kiện</th>
+      <th>Ý nghĩa lịch sử cốt lõi theo Văn kiện Đảng</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center">01</td>
+      <td align="center">27/09/1940</td>
+      <td><strong>Khởi nghĩa Bắc Sơn</strong> (Lạng Sơn)</td>
+      <td>Bước chuyển hướng chỉ đạo quan trọng; đặt nền móng cho lực lượng vũ trang tập trung.</td>
+    </tr>
+    <tr>
+      <td align="center">02</td>
+      <td align="center">23/11/1940</td>
+      <td><strong>Khởi nghĩa Nam Kỳ</strong> (Gia Định)</td>
+      <td>Để lại bài học xương máu về đánh giá thời cơ cách mạng và chuẩn bị lực lượng.</td>
+    </tr>
+    <tr>
+      <td align="center">03</td>
+      <td align="center">13/01/1941</td>
+      <td><strong>Binh biến Đô Lương</strong> (Nghệ An)</td>
+      <td>Khẳng định tầm quan trọng của công tác vận động binh lính địch (binh vận) của Đảng.</td>
+    </tr>
+    <tr>
+      <td align="center">04</td>
+      <td align="center">05/1941</td>
+      <td><strong>Hội nghị TW 8 tại Pác Bó</strong> (Cao Bằng)</td>
+      <td>Hoàn chỉnh chuyển hướng chỉ đạo chiến lược: Đặt quyền lợi dân tộc giải phóng lên tối cao.</td>
+    </tr>
+    <tr>
+      <td align="center">05</td>
+      <td align="center">22/12/1944</td>
+      <td><strong>Thành lập Đội VNTTGPQ</strong> (Cao Bằng)</td>
+      <td>Thành lập đội quân chủ lực đầu tiên, tiền thân Quân đội Nhân dân Việt Nam anh hùng.</td>
+    </tr>
+    <tr>
+      <td align="center">06</td>
+      <td align="center">15/04/1945</td>
+      <td><strong>Hội nghị Quân sự Bắc Kỳ</strong> (Hiệp Hòa)</td>
+      <td>Thống nhất lực lượng vũ trang thành Việt Nam Giải phóng quân, thành lập 7 chiến khu lớn.</td>
+    </tr>
+    <tr>
+      <td align="center">07</td>
+      <td align="center">16–17/08/1945</td>
+      <td><strong>Quốc dân Đại hội Tân Trào</strong> (Tuyên Quang)</td>
+      <td>Thông qua Lệnh Tổng khởi nghĩa, bầu ra Ủy ban Dân tộc Giải phóng (Chính phủ lâm thời).</td>
+    </tr>
+    <tr>
+      <td align="center">08</td>
+      <td align="center">19/08/1945</td>
+      <td><strong>Khởi nghĩa thắng lợi ở Hà Nội</strong></td>
+      <td>Đòn quyết định ở trung tâm đầu não Bắc Bộ, tạo hiệu ứng cổ vũ cho toàn quốc nổi dậy.</td>
+    </tr>
+    <tr>
+      <td align="center">09</td>
+      <td align="center">23/08/1945</td>
+      <td><strong>Khởi nghĩa thắng lợi ở Huế</strong></td>
+      <td>Lật đổ chế độ quân chủ phong kiến nghìn năm, vua Bảo Đại tuyên bố thoái vị.</td>
+    </tr>
+    <tr>
+      <td align="center">10</td>
+      <td align="center">25/08/1945</td>
+      <td><strong>Khởi nghĩa thắng lợi ở Sài Gòn</strong></td>
+      <td>Thắng lợi rực rỡ ở đô thị trung tâm Nam Bộ, đập tan mưu đồ của thực dân và phản động.</td>
+    </tr>
+    <tr>
+      <td align="center">11</td>
+      <td align="center">02/09/1945</td>
+      <td><strong>Tuyên ngôn Độc lập Ba Đình</strong></td>
+      <td>Đỉnh cao toàn thắng: Khai sinh nước Việt Nam Dân chủ Cộng hòa, hoàn thành xuất sắc Chương 1.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>PHẦN IV: CÁC ĐIỂM SÁNG TẠO NỔI BẬT CỦA SẢN PHẨM</h2>
+<p><strong>1. Bản đồ GIS đa tầng:</strong> Hỗ trợ 4 kiểu bản đồ (Địa chính, Vệ tinh, Địa hình vùng núi hiểm trở, và Cổ điển lưu trữ), giúp người xem quan sát địa hình theo góc nhìn trực quan nhất.</p>
+<p><strong>2. Khẳng định chủ quyền biển đảo thiêng liêng:</strong> Bản đồ thể hiện rõ nét Quần đảo Hoàng Sa (TP. Đà Nẵng) và Quần đảo Trường Sa (Tỉnh Khánh Hòa) với Quốc kỳ Việt Nam, góp phần bồi đắp lòng yêu nước và ý thức bảo vệ chủ quyền biên cương.</p>
+<p><strong>3. Dòng thời gian tương tác (Timeline Dock) & Chế độ Auto Tour:</strong> Giúp người học có thể lướt theo trình tự thời gian hoặc bấm "Khám phá tự động" để camera tự bay qua từng địa danh lịch sử.</p>
+<p><strong>4. Âm nhạc truyền cảm hứng & Tư liệu chính thống:</strong> Tích hợp ca khúc hào hùng <em>"Thịnh Vượng Việt Nam Sáng Ngời"</em> kết hợp video phóng sự từ VTV, Báo Nhân Dân, đem lại trải nghiệm học tập trọn vẹn.</p>
+<p><strong>5. Giao diện Sáng / Tối linh hoạt:</strong> Tối ưu thẩm mỹ theo phong cách Di sản hiện đại (Heritage Modern), thân thiện với mọi thiết bị.</p>
+
+<h2>PHẦN V: TÀI LIỆU THAM KHẢO CHÍNH THỐNG</h2>
+<p>1. Giáo trình Lịch sử Đảng Cộng sản Việt Nam (VNR202) – NXB Chính trị quốc gia Sự thật.</p>
+<p>2. Văn kiện Đảng Toàn tập (Tập 7: 1940 – 1945) – NXB Chính trị quốc gia Sự thật.</p>
+<p>3. Chỉ thị "Nhật - Pháp bắn nhau và hành động của chúng ta" (12/03/1945).</p>
+<p>4. Tuyên ngôn Độc lập (02/09/1945) – Hồ Chí Minh Toàn tập.</p>
+
+<div class="footer-sig">
+  <em>Hà Nội, Năm học 2026 – 2027</em><br>
+  <strong>ĐẠI DIỆN NHÓM 6</strong><br><br><br>
+  <strong>Nông Khánh Ly (Trưởng nhóm)</strong>
+</div>
+
+</body>
+</html>

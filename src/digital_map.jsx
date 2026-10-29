@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './digital_map.css';
-import themeSong from './themesong.mp3';
+import themeSong from './Thịnh Vượng Việt Nam Sáng Ngời.mp3';
 
-// 1. TẬP DỮ LIỆU ĐƯỢC CHUẨN HÓA & TINH GỌN TỪ TÀI LIỆU LỊCH SỬ ĐẢNG
+// 1. TẬP DỮ LIỆU ĐƯỢC CHUẨN HÓA TỪ VĂN KIỆN ĐẢNG & GIÁO TRÌNH LỊCH SỬ ĐẢNG
 const historicalEvents = [
   {
     id: 'bac-son',
@@ -239,10 +239,51 @@ const historicalEvents = [
   }
 ];
 
+// Cấu hình các lớp bản đồ miễn phí, tải tức thì, không cần API key
+const BASEMAP_OPTIONS = {
+  terrain: {
+    id: 'terrain',
+    label: 'Địa hình',
+    icon: '🏔️',
+    desc: 'Bản đồ địa hình chiến khu & đồi núi',
+    url: 'https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
+    maxZoom: 18,
+    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+  },
+  satellite: {
+    id: 'satellite',
+    label: 'Vệ tinh',
+    icon: '🛰️',
+    desc: 'Ảnh vệ tinh chụp toàn cảnh thực tế',
+    url: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+    maxZoom: 18,
+    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+  },
+  streets: {
+    id: 'streets',
+    label: 'Địa chính',
+    icon: '🗺️',
+    desc: 'Bản đồ giao thông & địa giới rõ nét',
+    url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+    maxZoom: 18,
+    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+  },
+  vintage: {
+    id: 'vintage',
+    label: 'Cổ điển',
+    icon: '📜',
+    desc: 'Bản đồ tư liệu địa lý Atlas phong cách cổ',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+    maxZoom: 18,
+    subdomains: []
+  }
+};
+
 export default function HistoricalMap() {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersLayerRef = useRef(null);
+  const tileLayerRef = useRef(null);
   const timelineRef = useRef(null);
 
   // Quản lý âm thanh
@@ -250,6 +291,7 @@ export default function HistoricalMap() {
   const audioCtxRef = useRef(null);
   const gainNodeRef = useRef(null);
 
+  // Quản lý trạng thái
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [filterCategory, setFilterCategory] = useState('ALL');
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -257,21 +299,45 @@ export default function HistoricalMap() {
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
   const [showAudioPrompt, setShowAudioPrompt] = useState(true);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [activeBasemap, setActiveBasemap] = useState('streets');
+  const [showBasemapMenu, setShowBasemapMenu] = useState(false);
+  const [isTourRunning, setIsTourRunning] = useState(false);
+  const [themeMode, setThemeMode] = useState('auto');
+  const tourTimerRef = useRef(null);
+
+  const effectiveTheme = themeMode === 'auto'
+    ? (activeBasemap === 'satellite' ? 'dark' : 'light')
+    : themeMode;
 
   const categories = [
-    { key: 'ALL', label: 'Tất cả' },
-    { key: 'Chủ trương chiến lược', label: 'Chủ trương' },
-    { key: 'Khởi nghĩa vũ trang', label: 'Khởi nghĩa' },
-    { key: 'Cao trào kháng Nhật', label: 'Kháng Nhật' },
-    { key: 'Tổng khởi nghĩa', label: 'Tổng khởi nghĩa' },
-    { key: 'Thắng lợi hoàn toàn', label: 'Độc lập' }
+    { key: 'ALL', label: 'Tất cả', count: 11, icon: '⭐' },
+    { key: 'chutruong', label: 'Chủ trương', count: 3, icon: '📜' },
+    { key: 'khoinghia', label: 'Khởi nghĩa', count: 3, icon: '⚔️' },
+    { key: 'lucluong', label: 'Xây dựng lực lượng', count: 2, icon: '🛡️' },
+    { key: 'tongkhoinghia', label: 'Tổng khởi nghĩa', count: 5, icon: '🏆' }
   ];
 
-  const filteredEvents = filterCategory === 'ALL'
-    ? historicalEvents
-    : historicalEvents.filter(ev => ev.category === filterCategory);
+  const matchesCategory = (ev, catKey) => {
+    if (catKey === 'ALL') return true;
+    const cat = ev.category.toLowerCase();
+    if (catKey === 'chutruong') {
+      return cat.includes('chủ trương') || cat.includes('đường lối');
+    }
+    if (catKey === 'khoinghia') {
+      return cat.includes('khởi nghĩa') || cat.includes('binh biến') || cat.includes('binh vận');
+    }
+    if (catKey === 'lucluong') {
+      return cat.includes('lực lượng') || cat.includes('quân sự');
+    }
+    if (catKey === 'tongkhoinghia') {
+      return cat.includes('tổng khởi nghĩa') || cat.includes('thắng lợi') || cat.includes('chớp thời cơ') || cat.includes('hoạch định');
+    }
+    return true;
+  };
 
-  // 1. KHỞI TẠO BẢN ĐỒ VÀ GẮN CHỦ QUYỀN BIỂN ĐẢO
+  const filteredEvents = historicalEvents.filter(ev => matchesCategory(ev, filterCategory));
+
+  // 1. KHỞI TẠO BẢN ĐỒ VÀ GẮN CHỦ QUYỀN BIỂN ĐẢO VIỆT NAM
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
@@ -281,63 +347,76 @@ export default function HistoricalMap() {
     }
 
     const strictBounds = [
-      [6.5, 101.0],
-      [26.5, 118.0]
+      [5.0, 99.0],
+      [27.5, 121.0]
     ];
 
     const isMobile = window.innerWidth <= 768;
 
     const map = L.map(mapContainerRef.current, {
-      center: isMobile ? [16.0, 107.2] : [16.2, 107.5],
-      zoom: isMobile ? 5.4 : 6.3,
-      minZoom: isMobile ? 5.0 : 5.8,
+      center: isMobile ? [16.0, 107.5] : [16.2, 107.8],
+      zoom: isMobile ? 5.2 : 5.85,
+      minZoom: isMobile ? 4.8 : 5.5,
       maxZoom: 18,
       maxBounds: strictBounds,
-      maxBoundsViscosity: 1.0,
+      maxBoundsViscosity: 0.8,
       zoomControl: false
     });
 
     L.control.zoom({ position: isMobile ? 'topright' : 'bottomright' }).addTo(map);
 
-    L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-      attribution: '&copy; Google Maps',
-      maxZoom: 20
+    // Lớp tile bản đồ mặc định
+    const currentCfg = BASEMAP_OPTIONS[activeBasemap] || BASEMAP_OPTIONS.terrain;
+    const initialTileLayer = L.tileLayer(currentCfg.url, {
+      attribution: '&copy; Google Maps / Bản đồ số Lịch sử',
+      subdomains: currentCfg.subdomains.length ? currentCfg.subdomains : 'abc',
+      maxZoom: currentCfg.maxZoom
     }).addTo(map);
 
-    // Nhãn Hoàng Sa
+    tileLayerRef.current = initialTileLayer;
+
+    // Biểu tượng Lá cờ Tổ quốc Việt Nam SVG sắc nét
+    const vietnamFlagSvg = `
+      <svg class="island-flag-svg" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+        <rect width="30" height="20" fill="#da251d" rx="2" />
+        <polygon points="15,4 16.35,8.14 20.71,8.15 17.18,10.71 18.53,14.85 15,12.3 11.47,14.85 12.82,10.71 9.29,8.15 13.65,8.14" fill="#ffeb3b" />
+      </svg>
+    `;
+
+    // Nhãn chủ quyền Hoàng Sa (Lá cờ + Tên địa danh)
     const hoangSaBadge = L.divIcon({
-      className: 'custom-island-badge',
+      className: 'custom-island-marker-wrapper',
       html: `
-        <div class="island-tag-box" style="padding: 6px 12px; min-width: 170px; text-align: center; justify-content: center;">
-          <span class="flag" style="font-size: 18px;">🇻🇳</span>
-          <div class="tag-text">
-            <strong style="font-size: 13px; letter-spacing: 0.5px;">QUẦN ĐẢO HOÀNG SA</strong>
-            <small style="font-size: 10.5px; opacity: 0.95;">(TP. Đà Nẵng, Việt Nam)</small>
+        <div class="sovereign-island-label">
+          ${vietnamFlagSvg}
+          <div class="island-info">
+            <strong class="island-title">QUẦN ĐẢO HOÀNG SA</strong>
+            <span class="island-sub">Huyện Hoàng Sa • TP. Đà Nẵng</span>
           </div>
         </div>
       `,
-      iconSize: [180, 44],
-      iconAnchor: [90, 22]
+      iconSize: [260, 42],
+      iconAnchor: [12, 21]
     });
 
-    // Nhãn Trường Sa
+    // Nhãn chủ quyền Trường Sa (Lá cờ + Tên địa danh)
     const truongSaBadge = L.divIcon({
-      className: 'custom-island-badge',
+      className: 'custom-island-marker-wrapper',
       html: `
-        <div class="island-tag-box" style="padding: 6px 12px; min-width: 170px; text-align: center; justify-content: center;">
-          <span class="flag" style="font-size: 18px;">🇻🇳</span>
-          <div class="tag-text">
-            <strong style="font-size: 13px; letter-spacing: 0.5px;">QUẦN ĐẢO TRƯỜNG SA</strong>
-            <small style="font-size: 10.5px; opacity: 0.95;">(Khánh Hòa, Việt Nam)</small>
+        <div class="sovereign-island-label">
+          ${vietnamFlagSvg}
+          <div class="island-info">
+            <strong class="island-title">QUẦN ĐẢO TRƯỜNG SA</strong>
+            <span class="island-sub">Huyện Trường Sa • Tỉnh Khánh Hòa</span>
           </div>
         </div>
       `,
-      iconSize: [180, 44],
-      iconAnchor: [90, 22]
+      iconSize: [260, 42],
+      iconAnchor: [12, 21]
     });
 
-    L.marker([16.54, 112.1], { icon: hoangSaBadge, interactive: false }).addTo(map);
-    L.marker([9.5, 113.5], { icon: truongSaBadge, interactive: false }).addTo(map);
+    L.marker([16.7, 112.5], { icon: hoangSaBadge, interactive: false }).addTo(map);
+    L.marker([10.4, 114.2], { icon: truongSaBadge, interactive: false }).addTo(map);
 
     markersLayerRef.current = L.layerGroup().addTo(map);
 
@@ -355,7 +434,24 @@ export default function HistoricalMap() {
     };
   }, []);
 
-  // 2. VẼ MARKER LÊN BẢN ĐỒ
+  // 2. THAY ĐỔI LỚP BẢN ĐỒ KHI NGƯỜI DÙNG CHỌN
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+    if (tileLayerRef.current) {
+      mapInstanceRef.current.removeLayer(tileLayerRef.current);
+    }
+    const currentCfg = BASEMAP_OPTIONS[activeBasemap] || BASEMAP_OPTIONS.terrain;
+    const newLayer = L.tileLayer(currentCfg.url, {
+      attribution: '&copy; Google / Esri / Bản đồ số Lịch sử',
+      subdomains: currentCfg.subdomains.length ? currentCfg.subdomains : 'abc',
+      maxZoom: currentCfg.maxZoom
+    }).addTo(mapInstanceRef.current);
+
+    newLayer.bringToBack();
+    tileLayerRef.current = newLayer;
+  }, [activeBasemap]);
+
+  // 3. VẼ MARKER ĐỊA DANH MỐC SON LÊN BẢN ĐỒ
   useEffect(() => {
     if (!mapInstanceRef.current || !markersLayerRef.current) return;
 
@@ -363,34 +459,42 @@ export default function HistoricalMap() {
 
     filteredEvents.forEach((ev) => {
       const isSelected = selectedEvent?.id === ev.id;
+      const originalIndex = historicalEvents.findIndex(e => e.id === ev.id) + 1;
+      const shortName = ev.title.split('&')[0].split(':')[0].replace(/\(.*?\)/g, '').trim();
+      const year = ev.date.slice(-4);
+
       const markerHtml = `
-        <div class="custom-pin ${isSelected ? 'is-active' : ''}">
-          <div class="pin-pulse"></div>
-          <div class="pin-core">★</div>
+        <div class="custom-heritage-pin ${isSelected ? 'is-selected' : ''}">
+          <div class="pin-radar-ring"></div>
+          <div class="pin-core-badge">
+            <span class="pin-icon-star">★</span>
+            <span class="pin-order-num">${originalIndex}</span>
+          </div>
+          <div class="pin-floating-tag">
+            <span class="pin-tag-title">${shortName}</span>
+            <span class="pin-tag-year">${year}</span>
+          </div>
         </div>
       `;
 
       const customIcon = L.divIcon({
         html: markerHtml,
-        className: 'marker-container',
-        iconSize: [36, 36],
-        iconAnchor: [18, 18]
+        className: 'marker-container-box',
+        iconSize: [44, 44],
+        iconAnchor: [22, 22]
       });
 
       const marker = L.marker(ev.coords, { icon: customIcon });
       marker.on('click', () => {
-        setIsVideoPlaying(false);
-        setSelectedEvent(ev);
-        const isMobile = window.innerWidth <= 768;
-        const targetLat = isMobile ? ev.coords[0] - 0.4 : ev.coords[0];
-        mapInstanceRef.current.flyTo([targetLat, ev.coords[1]], 8.5, { duration: 1.0 });
+        stopTour();
+        handleSelectEvent(ev);
       });
 
       markersLayerRef.current.addLayer(marker);
     });
   }, [filteredEvents, selectedEvent]);
 
-  // 3. XỬ LÝ ÂM THANH
+  // 4. QUẢN LÝ ÂM THANH NỀN HÀO HÙNG
   const getAudioInstance = () => {
     if (!audioRef.current) {
       const audio = new Audio(themeSong);
@@ -402,7 +506,7 @@ export default function HistoricalMap() {
         if (AudioContext) {
           const ctx = new AudioContext();
           const gainNode = ctx.createGain();
-          gainNode.gain.value = 0.2;
+          gainNode.gain.value = 0.22;
 
           const source = ctx.createMediaElementSource(audio);
           source.connect(gainNode);
@@ -413,7 +517,7 @@ export default function HistoricalMap() {
         }
       } catch (err) {
         console.warn("Fallback HTML Audio:", err);
-        audio.volume = 0.2;
+        audio.volume = 0.22;
       }
 
       audio.onplay = () => setIsPlayingMusic(true);
@@ -456,9 +560,9 @@ export default function HistoricalMap() {
   useEffect(() => {
     if (!audioRef.current) return;
     if (selectedEvent || isVideoPlaying) {
-      fadeVolume(0.05, 0.5);
+      fadeVolume(0.06, 0.5);
     } else {
-      fadeVolume(0.2, 1.2);
+      fadeVolume(0.22, 1.2);
     }
   }, [selectedEvent, isVideoPlaying]);
 
@@ -483,320 +587,586 @@ export default function HistoricalMap() {
     }
   };
 
-  const handleCategoryChange = (catKey) => {
-    setFilterCategory(catKey);
-    if (timelineRef.current) timelineRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-    if (selectedEvent && catKey !== 'ALL' && selectedEvent.category !== catKey) {
-      setIsVideoPlaying(false);
-      setSelectedEvent(null);
-    }
-  };
-
+  // 5. ĐIỀU HƯỚNG SỰ KIỆN & THAM QUAN TỰ ĐỘNG
   const handleSelectEvent = (ev) => {
     setIsVideoPlaying(false);
     setSelectedEvent(ev);
     if (mapInstanceRef.current) {
       const isMobile = window.innerWidth <= 768;
       const targetLat = isMobile ? ev.coords[0] - 0.4 : ev.coords[0];
-      mapInstanceRef.current.flyTo([targetLat, ev.coords[1]], 8.5, { duration: 1.0 });
+      mapInstanceRef.current.flyTo([targetLat, ev.coords[1]], 8.8, {
+        duration: 1.2,
+        easeLinearity: 0.25
+      });
+    }
+
+    // Cuộn timeline đến nút đang chọn
+    if (timelineRef.current) {
+      const activeBtn = timelineRef.current.querySelector(`[data-id="${ev.id}"]`);
+      if (activeBtn) {
+        activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
     }
   };
 
   const handleCloseSidebar = () => {
+    stopTour();
     setIsVideoPlaying(false);
     setSelectedEvent(null);
   };
 
+  const handleCategoryChange = (catKey) => {
+    stopTour();
+    setFilterCategory(catKey);
+    if (timelineRef.current) timelineRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+    if (selectedEvent && !matchesCategory(selectedEvent, catKey)) {
+      setIsVideoPlaying(false);
+      setSelectedEvent(null);
+    }
+  };
+
   const scrollTimeline = (dir) => {
     if (timelineRef.current) {
-      const scrollAmount = dir === 'left' ? -260 : 260;
+      const scrollAmount = dir === 'left' ? -280 : 280;
       timelineRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
+  // Chế độ tham quan tự động
+  const startTour = () => {
+    setIsTourRunning(true);
+    setFilterCategory('ALL');
+    let idx = 0;
+    const runStep = (i) => {
+      if (i >= historicalEvents.length) {
+        setIsTourRunning(false);
+        return;
+      }
+      handleSelectEvent(historicalEvents[i]);
+      tourTimerRef.current = setTimeout(() => {
+        runStep(i + 1);
+      }, 7500);
+    };
+    runStep(idx);
+  };
+
+  const stopTour = () => {
+    if (tourTimerRef.current) {
+      clearTimeout(tourTimerRef.current);
+      tourTimerRef.current = null;
+    }
+    setIsTourRunning(false);
+  };
+
+  // Tìm sự kiện trước và sau để điều hướng trong sidebar
+  const currentEventIdx = selectedEvent ? historicalEvents.findIndex(e => e.id === selectedEvent.id) : -1;
+  const prevEvent = currentEventIdx > 0 ? historicalEvents[currentEventIdx - 1] : null;
+  const nextEvent = currentEventIdx >= 0 && currentEventIdx < historicalEvents.length - 1 ? historicalEvents[currentEventIdx + 1] : null;
+
   return (
-    <div className="map-page-layout">
-      {/* 1. HEADER */}
-      <header className="map-header">
-        <div className="header-top-row">
-          <div className="header-brand">
-            <span className="brand-flag">☭</span>
-            <div className="brand-titles">
-              <h1>BẢN ĐỒ MỐC SON LỊCH SỬ (1939 - 1945)</h1>
-              <p>Cách mạng Tháng Tám toàn thắng</p>
-            </div>
+    <div className="heritage-map-app" data-theme={effectiveTheme} data-basemap={activeBasemap}>
+      {/* 1. THANH TIÊU ĐỀ CHÍNH (HEADER) */}
+      <header className="heritage-navbar">
+        <div className="nav-brand-section">
+          <div className="national-emblem-badge">
+            <span className="emblem-star">★</span>
           </div>
-
-          <div className="header-actions">
-            <button
-              className={`music-btn ${isPlayingMusic ? 'playing' : ''}`}
-              onClick={toggleMusic}
-              title={isPlayingMusic ? "Tắt nhạc" : "Bật nhạc"}
-            >
-              {isPlayingMusic ? '🔊' : '🔇'}
-            </button>
-
-            <button 
-              className="info-nav-btn" 
-              onClick={() => setShowInfoModal(true)}
-              title="Xem nhóm tác giả & tài liệu"
-            >
-              Tác giả & Tài liệu
-            </button>
+          <div className="brand-text-block">
+            <h1 className="brand-main-title">BẢN ĐỒ MỐC SON LỊCH SỬ (1939 - 1945)</h1>
+            <p className="brand-sub-title">Sản phẩm sáng tạo VNR202 • Lịch sử Đảng Cộng sản Việt Nam (Đại học FPT)</p>
           </div>
         </div>
 
-        <div className="filter-bar">
-          {categories.map((cat) => (
+        {/* Thanh công cụ điều khiển nhanh */}
+        <div className="nav-toolbar-section">
+          {/* Nút chọn kiểu bản đồ */}
+          <div className="basemap-selector-dropdown">
             <button
-              key={cat.key}
-              className={`filter-btn ${filterCategory === cat.key ? 'active' : ''}`}
-              onClick={() => handleCategoryChange(cat.key)}
+              className="toolbar-btn basemap-trigger-btn"
+              onClick={() => setShowBasemapMenu(!showBasemapMenu)}
+              title="Đổi kiểu bản đồ hiển thị"
             >
-              {cat.label}
+              <span className="btn-icon">{BASEMAP_OPTIONS[activeBasemap]?.icon}</span>
+              <span className="btn-label">{BASEMAP_OPTIONS[activeBasemap]?.label}</span>
+              <span className="dropdown-caret">▾</span>
             </button>
-          ))}
+
+            {showBasemapMenu && (
+              <div className="basemap-menu-popover" onClick={() => setShowBasemapMenu(false)}>
+                <div className="popover-heading">Chọn kiểu bản đồ:</div>
+                {Object.values(BASEMAP_OPTIONS).map((opt) => (
+                  <button
+                    key={opt.id}
+                    className={`basemap-option-item ${activeBasemap === opt.id ? 'active' : ''}`}
+                    onClick={() => setActiveBasemap(opt.id)}
+                  >
+                    <span className="opt-icon">{opt.icon}</span>
+                    <div className="opt-text">
+                      <strong className="opt-name">{opt.label}</strong>
+                      <small className="opt-desc">{opt.desc}</small>
+                    </div>
+                    {activeBasemap === opt.id && <span className="opt-check">✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Nút chuyển đổi Giao diện Sáng / Tối */}
+          <button
+            className="toolbar-btn theme-toggle-btn"
+            onClick={() => setThemeMode(effectiveTheme === 'light' ? 'dark' : 'light')}
+            title={effectiveTheme === 'light' ? "Chuyển sang giao diện Tối" : "Chuyển sang giao diện Sáng"}
+          >
+            <span className="btn-icon">{effectiveTheme === 'light' ? '☀️' : '🌙'}</span>
+            <span className="btn-label desktop-only">{effectiveTheme === 'light' ? 'Sáng' : 'Tối'}</span>
+          </button>
+
+          {/* Nút Tham quan tự động (Auto Tour) */}
+          <button
+            className={`toolbar-btn tour-btn ${isTourRunning ? 'running' : ''}`}
+            onClick={isTourRunning ? stopTour : startTour}
+            title={isTourRunning ? "Dừng hành trình tự động" : "Bắt đầu hành trình tự động qua các mốc son"}
+          >
+            <span className="btn-icon">{isTourRunning ? '⏹' : '▶'}</span>
+            <span className="btn-label">{isTourRunning ? 'Dừng Tour' : 'Khám phá tự động'}</span>
+          </button>
+
+          {/* Nút Âm thanh nền */}
+          <button
+            className={`toolbar-btn music-btn ${isPlayingMusic ? 'is-playing' : ''}`}
+            onClick={toggleMusic}
+            title={isPlayingMusic ? "Tắt nhạc nền" : "Bật nhạc nền hào hùng"}
+          >
+            <span className="btn-icon">{isPlayingMusic ? '🔊' : '🔇'}</span>
+            <span className="btn-label desktop-only">{isPlayingMusic ? 'Nhạc nền: BẬT' : 'Nhạc nền: TẮT'}</span>
+          </button>
+
+          {/* Nút Hồ sơ đề tài & tác giả */}
+          <button 
+            className="toolbar-btn info-btn" 
+            onClick={() => setShowInfoModal(true)}
+            title="Xem hồ sơ nhóm tác giả & tư liệu tham khảo"
+          >
+            <span className="btn-icon">🏛️</span>
+            <span className="btn-label desktop-only">Hồ sơ & Tư liệu</span>
+          </button>
         </div>
       </header>
 
-      {/* 2. MAP VIEW */}
-      <div className="map-viewport" ref={mapContainerRef} />
-
-      {/* 3. TIMELINE BAR */}
-      <div className={`timeline-wrapper ${selectedEvent ? 'with-sidebar' : ''}`}>
-        <button className="scroll-btn prev desktop-only" onClick={() => scrollTimeline('left')}>‹</button>
-        <div className="quick-timeline-bar" ref={timelineRef}>
-          {filteredEvents.map((ev) => (
+      {/* 2. THANH BỘ LỌC CHỦ ĐỀ CÁCH MẠNG */}
+      <nav className="heritage-filter-ribbon">
+        <div className="filter-chips-container">
+          {categories.map((cat) => (
             <button
-              key={ev.id}
-              className={`timeline-chip ${selectedEvent?.id === ev.id ? 'active' : ''}`}
-              onClick={() => handleSelectEvent(ev)}
+              key={cat.key}
+              className={`heritage-chip ${filterCategory === cat.key ? 'is-active' : ''}`}
+              onClick={() => handleCategoryChange(cat.key)}
             >
-              <span className="chip-date">{ev.date.split('–')[0].trim()}</span>
-              <span className="chip-name">{ev.title.split('(')[0].split(':')[0]}</span>
+              <span className="chip-symbol">{cat.icon}</span>
+              <span className="chip-text">{cat.label}</span>
+              <span className="chip-count-pill">{cat.count}</span>
             </button>
           ))}
         </div>
-        <button className="scroll-btn next desktop-only" onClick={() => scrollTimeline('right')}>›</button>
-      </div>
+      </nav>
 
-      {/* 4. SIDEBAR CHI TIẾT SỰ KIỆN - THIẾT KẾ CARD TRỰC QUAN */}
-      <aside className={`info-sidebar ${selectedEvent ? 'open' : ''}`}>
-        {selectedEvent && (
-          <div className="sidebar-inner">
-            <div className="mobile-sheet-handle" onClick={handleCloseSidebar} />
-            <button className="close-sidebar-btn" onClick={handleCloseSidebar} title="Đóng">✕</button>
+      {/* 3. KHU VỰC BẢN ĐỒ TƯƠNG TÁC */}
+      <main className="heritage-map-canvas" ref={mapContainerRef} />
 
-            <div className="sidebar-top">
-              <span className="badge-tag">{selectedEvent.category}</span>
-              <span className="badge-date">📅 {selectedEvent.date}</span>
-            </div>
+      {/* 4. DÒNG THỜI GIAN NGANG (HORIZONTAL TIMELINE) */}
+      <section className={`heritage-timeline-dock ${selectedEvent ? 'has-drawer' : ''}`}>
+        <button 
+          className="dock-nav-btn prev" 
+          onClick={() => scrollTimeline('left')}
+          title="Xem mốc trước"
+        >
+          ‹
+        </button>
 
-            <h2 className="event-heading">{selectedEvent.title}</h2>
+        <div className="dock-scroll-track" ref={timelineRef}>
+          {filteredEvents.map((ev, idx) => {
+            const isCurrent = selectedEvent?.id === ev.id;
+            const originalIndex = historicalEvents.findIndex(e => e.id === ev.id) + 1;
+            const shortName = ev.title.split('&')[0].split(':')[0].trim();
+            const dateStr = ev.date.split('–')[0].trim();
 
-            <blockquote className="event-quote">
-              “{selectedEvent.highlight}”
-            </blockquote>
-
-            {/* VIDEO TƯ LIỆU */}
-            <div className="video-card">
-              <iframe
-                title={selectedEvent.title}
-                src={`${selectedEvent.videoEmbed}?enablejsapi=1`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                onLoad={(e) => {
-                  e.target.contentWindow?.postMessage('{"event":"listening"}', '*');
+            return (
+              <button
+                key={ev.id}
+                data-id={ev.id}
+                className={`timeline-milestone-card ${isCurrent ? 'is-focused' : ''}`}
+                onClick={() => {
+                  stopTour();
+                  handleSelectEvent(ev);
                 }}
-              />
-            </div>
-
-            <div className="video-source-box">
-              <span className="source-icon">📺</span>
-              <span className="source-text">
-                Nguồn: <strong>{selectedEvent.videoSource}</strong>
-              </span>
-            </div>
-
-            {/* 1. KHỐI CON SỐ BIẾT NÓI */}
-            <div className="quick-stats-grid">
-              {selectedEvent.stats.map((s, idx) => (
-                <div key={idx} className="stat-box">
-                  <span className="stat-val">{s.val}</span>
-                  <span className="stat-lbl">{s.label}</span>
+              >
+                <div className="card-top-meta">
+                  <span className="order-badge">Mốc {originalIndex}</span>
+                  <span className="date-badge">{dateStr}</span>
                 </div>
-              ))}
+                <div className="card-title-text">{shortName}</div>
+              </button>
+            );
+          })}
+        </div>
+
+        <button 
+          className="dock-nav-btn next" 
+          onClick={() => scrollTimeline('right')}
+          title="Xem mốc kế tiếp"
+        >
+          ›
+        </button>
+      </section>
+
+      {/* 5. SIDEBAR CHI TIẾT SỰ KIỆN LỊCH SỬ */}
+      <aside className={`heritage-detail-drawer ${selectedEvent ? 'is-open' : ''}`}>
+        {selectedEvent && (
+          <div className="drawer-inner-content">
+            {/* Thanh điều khiển trên cùng */}
+            <div className="drawer-header-strip">
+              <div className="drawer-category-pill">
+                <span className="cat-icon">⭐</span>
+                <span>{selectedEvent.category}</span>
+              </div>
+              <button 
+                className="drawer-close-icon-btn" 
+                onClick={handleCloseSidebar}
+                title="Đóng bảng chi tiết"
+              >
+                ✕
+              </button>
             </div>
 
-            {/* 2. KHỐI NHÂN VẬT THEN CHỐT */}
-            <div className="key-figures-box">
-              <span className="figure-label">👤 Nhân vật chủ chốt:</span>
-              {selectedEvent.figures.map((fig, idx) => (
-                <span key={idx} className="figure-tag">{fig}</span>
-              ))}
+            {/* Điều hướng mốc trước / sau ngay trong sidebar */}
+            <div className="drawer-step-navigation">
+              <button 
+                disabled={!prevEvent}
+                className="step-nav-btn prev-btn"
+                onClick={() => prevEvent && handleSelectEvent(prevEvent)}
+              >
+                ← Mốc trước
+              </button>
+              <span className="step-counter">
+                {currentEventIdx + 1} / {historicalEvents.length}
+              </span>
+              <button 
+                disabled={!nextEvent}
+                className="step-nav-btn next-btn"
+                onClick={() => nextEvent && handleSelectEvent(nextEvent)}
+              >
+                Mốc sau →
+              </button>
             </div>
 
-            {/* 3. DÒNG THỜI GIAN DIỄN BIẾN NHANH */}
-            <div className="event-body">
-              <h3 style={{ fontSize: '13.5px', margin: '14px 0 6px 0', color: '#111' }}>
-                ⚡ Diễn biến sự kiện tóm tắt:
-              </h3>
-              <div className="mini-timeline-list">
-                {selectedEvent.timelineSteps.map((step, idx) => (
-                  <div key={idx} className="mini-step-item">
-                    <span className="step-time-badge">{step.time}</span>
-                    <p className="step-content">{step.text}</p>
+            {/* Tiêu đề & Ngày diễn ra */}
+            <div className="drawer-event-headline">
+              <div className="event-date-callout">📅 {selectedEvent.date}</div>
+              <h2 className="event-main-title">{selectedEvent.title}</h2>
+            </div>
+
+            {/* Trích dẫn trọng tâm */}
+            <div className="drawer-highlight-quote">
+              <span className="quote-mark">“</span>
+              <p className="quote-text">{selectedEvent.highlight}</p>
+            </div>
+
+            {/* Video tư liệu lịch sử */}
+            <div className="drawer-video-container">
+              <div className="video-player-wrapper">
+                <iframe
+                  title={selectedEvent.title}
+                  src={`${selectedEvent.videoEmbed}?enablejsapi=1`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  onLoad={(e) => {
+                    e.target.contentWindow?.postMessage('{"event":"listening"}', '*');
+                  }}
+                />
+              </div>
+              <div className="video-source-caption">
+                <span className="caption-icon">📺</span>
+                <span>Nguồn tư liệu: <strong>{selectedEvent.videoSource}</strong></span>
+              </div>
+            </div>
+
+            {/* Khối con số và thông số trọng yếu */}
+            <div className="drawer-stats-section">
+              <h3 className="section-title">THÔNG SỐ & LỰC LƯỢNG</h3>
+              <div className="stats-cards-grid">
+                {selectedEvent.stats.map((s, idx) => (
+                  <div key={idx} className="stat-highlight-card">
+                    <span className="stat-value">{s.val}</span>
+                    <span className="stat-label">{s.label}</span>
                   </div>
                 ))}
               </div>
+            </div>
 
-              {/* 4. Ý NGHĨA ĐÚC KẾT */}
-              <div className="significance-card">
-                <h4>Ý NGHĨA LỊCH SỬ</h4>
-                <p>{selectedEvent.significance}</p>
+            {/* Nhân vật lịch sử chủ chốt */}
+            <div className="drawer-figures-section">
+              <h3 className="section-title">NHÂN VẬT LÃNH ĐẠO CHỦ CHỐT</h3>
+              <div className="figures-tags-wrap">
+                {selectedEvent.figures.map((fig, idx) => (
+                  <div key={idx} className="figure-badge">
+                    <span className="figure-avatar">👤</span>
+                    <span className="figure-name">{fig}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="sidebar-footer">
-              <span>Trích: Văn kiện Đảng Toàn tập & Giáo trình Lịch sử Đảng</span>
+            {/* Diễn biến theo dòng thời gian */}
+            <div className="drawer-timeline-section">
+              <h3 className="section-title">DIỄN BIẾN SỰ KIỆN TRỌNG TÂM</h3>
+              <div className="vertical-timeline-steps">
+                {selectedEvent.timelineSteps.map((step, idx) => (
+                  <div key={idx} className="timeline-step-row">
+                    <div className="step-time-node">
+                      <span className="node-dot"></span>
+                      <span className="node-time">{step.time}</span>
+                    </div>
+                    <div className="step-text-bubble">
+                      <p>{step.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Ý nghĩa lịch sử & Bài học */}
+            <div className="drawer-significance-card">
+              <div className="significance-header">
+                <span className="sig-icon">📜</span>
+                <h4>Ý NGHĨA LỊCH SỬ & BÀI HỌC KINH NGHIỆM</h4>
+              </div>
+              <p className="sig-body">{selectedEvent.significance}</p>
+            </div>
+
+            {/* Chú thích nguồn tài liệu */}
+            <div className="drawer-footer-reference">
+              <p>📖 Trích dẫn chính thức từ <em>Văn kiện Đảng Toàn tập (Tập 7)</em> và <em>Giáo trình Lịch sử Đảng Cộng sản Việt Nam</em>.</p>
             </div>
           </div>
         )}
       </aside>
 
-      {/* 5. MODAL TÁC GIẢ & TÀI LIỆU */}
+      {/* 6. MODAL HỒ SƠ ĐỀ TÀI & TÀI LIỆU */}
       {showInfoModal && (
-        <div className="modal-backdrop" onClick={() => setShowInfoModal(false)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="modal-title-group">
-                <span className="modal-icon">🏛️️</span>
+        <div className="heritage-modal-backdrop" onClick={() => setShowInfoModal(false)}>
+          <div className="heritage-modal-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-dialog-header">
+              <div className="dialog-title-group">
+                <span className="dialog-emblem">🏛️</span>
                 <div>
-                  <h3>DỰ ÁN SỐ HÓA LỊCH SỬ ĐẢNG</h3>
-                  <p>Môn học: Lịch sử Đảng Cộng sản Việt Nam</p>
+                  <h3 className="dialog-heading">SẢN PHẨM SÁNG TẠO MÔN HỌC VNR202</h3>
+                  <p className="dialog-sub">Lịch sử Đảng Cộng sản Việt Nam — Trường Đại học FPT</p>
                 </div>
               </div>
-              <button className="modal-close-btn" onClick={() => setShowInfoModal(false)}>✕</button>
+              <button 
+                className="dialog-close-btn" 
+                onClick={() => setShowInfoModal(false)}
+                title="Đóng cửa sổ"
+              >
+                ✕
+              </button>
             </div>
 
-            <div className="modal-tab-bar">
+            {/* Thanh Tab */}
+            <div className="dialog-tab-bar">
               <button 
-                className={`tab-btn ${infoTab === 'authors' ? 'active' : ''}`}
+                className={`tab-btn ${infoTab === 'authors' ? 'is-active' : ''}`}
                 onClick={() => setInfoTab('authors')}
               >
-                👤 Nhóm Tác Giả
+                👤 Nhóm Tác Giả (Nhóm 6)
               </button>
               <button 
-                className={`tab-btn ${infoTab === 'references' ? 'active' : ''}`}
+                className={`tab-btn ${infoTab === 'curriculum' ? 'is-active' : ''}`}
+                onClick={() => setInfoTab('curriculum')}
+              >
+                🎓 Khung Môn Học VNR202
+              </button>
+              <button 
+                className={`tab-btn ${infoTab === 'references' ? 'is-active' : ''}`}
                 onClick={() => setInfoTab('references')}
               >
                 📚 Tư Liệu & Tham Khảo
               </button>
             </div>
 
-            <div className="modal-body-content">
-              {infoTab === 'authors' ? (
-                <div className="tab-pane">
-                  <div className="project-card">
-                    <h4>ĐỀ TÀI: BẢN ĐỒ SỐ ĐỊA BÀN CHIẾN LƯỢC (1939 - 1945)</h4>
-                    <p>Ứng dụng công nghệ bản đồ tương tác số hóa không gian lịch sử thời kỳ tiền khởi nghĩa và Cách mạng Tháng Tám toàn thắng.</p>
+            <div className="dialog-tab-body">
+              {infoTab === 'authors' && (
+                <div className="tab-pane-content">
+                  <div className="project-intro-banner">
+                    <h4>ĐỀ TÀI: BẢN ĐỒ SỐ ĐỊA DANH PHONG TRÀO GIẢI PHÓNG DÂN TỘC (1939 - 1945)</h4>
+                    <p>Sản phẩm sáng tạo học phần <strong>VNR202 – Lịch sử Đảng Cộng sản Việt Nam</strong> tại Trường Đại học FPT. Ứng dụng công nghệ bản đồ số GIS kết hợp dữ liệu tương tác đa phương tiện số hóa không gian lịch sử thời kỳ tiền khởi nghĩa và Cách mạng Tháng Tám 1945 thuộc <strong>Chương 1</strong> giáo trình chuẩn.</p>
                   </div>
                   
-                  <h5 className="section-subtitle">GIẢNG VIÊN HƯỚNG DẪN:</h5> 
-                  <div className="author-grid">
-                    <div className="author-item">
-                      <div className="author-avatar">★</div>
-                      <div className="author-meta">
-                        <span className="name">Thầy Nguyễn Văn Chung</span>
+                  <div className="lecturer-section">
+                    <span className="role-caption">GIẢNG VIÊN HƯỚNG DẪN:</span>
+                    <div className="lecturer-card">
+                      <div className="lecturer-avatar">⭐</div>
+                      <div className="lecturer-info">
+                        <strong>Thầy Kiều Văn Nam</strong>
+                        <span>Bộ môn Lý luận Chính trị • Trường Đại học FPT</span>
                       </div>
                     </div>
                   </div>
 
-                  <h5 className="section-subtitle">THÀNH VIÊN NHÓM THỰC HIỆN:</h5>
-                  <div className="author-grid">
-                    <div className="author-item">
-                      <div className="author-avatar">★</div>
-                      <div className="author-meta">
-                        <span className="name">Huỳnh Thanh Huy (Nhóm trưởng)</span>
-                        <span className="sub">MSSV: 24149138</span>
-                      </div>
-                    </div>
-                    <div className="author-item">
-                      <div className="author-avatar">★</div>
-                      <div className="author-meta">
-                        <span className="name">Nguyễn Minh Tú</span>
-                        <span className="sub">MSSV: 25134117</span>
-                      </div>
-                    </div>
-                    <div className="author-item">
-                      <div className="author-avatar">★</div>
-                      <div className="author-meta">
-                        <span className="name">Phạm Minh Hoàng</span>
-                        <span className="sub">MSSV: 24134026</span>
-                      </div>
-                    </div>
-                    <div className="author-item">
-                      <div className="author-avatar">★</div>
-                      <div className="author-meta">
-                        <span className="name">Võ Thị Hồng Phương</span>
-                        <span className="sub">MSSV: 24128156</span>
-                      </div>
-                    </div>
-                    <div className="author-item">
-                      <div className="author-avatar">★</div>
-                      <div className="author-meta">
-                        <span className="name">Nguyễn Tấn Hiếu</span>
-                        <span className="sub">MSSV: 24128064</span>
-                      </div>
+                  <div className="members-section">
+                    <span className="role-caption">THÀNH VIÊN NHÓM THỰC HIỆN — NHÓM 6 (11 THÀNH VIÊN):</span>
+                    <div className="members-grid-layout">
+                      {[
+                        { mssv: 'HA173007', name: 'Nông Khánh Ly' },
+                        { mssv: 'HA176019', name: 'Hà Kiều Nương' },
+                        { mssv: 'HS170496', name: 'Nguyễn Minh Hiếu' },
+                        { mssv: 'HS180378', name: 'Dương Thị Như Quỳnh' },
+                        { mssv: 'HS181003', name: 'Nguyễn Trần Mai Phương' },
+                        { mssv: 'HS186181', name: 'Trần Thục Quyên' },
+                        { mssv: 'HE190810', name: 'Nguyễn Hữu Long' },
+                        { mssv: 'HS180642', name: 'Nguyễn Thị Thuỳ Trang' },
+                        { mssv: 'HS180737', name: 'Nguyễn Thị Thu' },
+                        { mssv: 'HS186211', name: 'Trần Thị Thanh Hiền' },
+                        { mssv: 'HS181177', name: 'Vũ Thu Hà' }
+                      ].map((member, idx) => (
+                        <div key={member.mssv} className="member-card">
+                          <div className="member-avatar">{idx + 1}</div>
+                          <div className="member-meta">
+                            <span className="member-name">{member.name}</span>
+                            <span className="member-mssv">MSSV: {member.mssv}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  <div className="criteria-box">
-                    <strong>Thông tin lớp học:</strong> Nhóm 1 – Lớp LLCT220514 (Nhóm 4) – Học kỳ I, năm học 2026-2027.
+                  <div className="class-info-banner">
+                    <strong>Thông tin học phần:</strong> Nhóm 6 • Môn VNR202 (Lịch sử Đảng Cộng sản Việt Nam) • Trường Đại học FPT • GVHD: Thầy Kiều Văn Nam.
                   </div>
                 </div>
-              ) : (
-                <div className="tab-pane">
-                  <h5 className="section-subtitle">VĂN KIỆN & TÀI LIỆU LỊCH SỬ CHÍNH THỐNG:</h5>
-                  <ul className="doc-list">
-                    <li>
-                      <strong>1. Giáo trình Lịch sử Đảng Cộng sản Việt Nam</strong>, NXB Chính trị quốc gia Sự thật.
+              )}
+
+              {infoTab === 'curriculum' && (
+                <div className="tab-pane-content">
+                  <div className="curriculum-overview-card">
+                    <div className="curriculum-badge">MÔN HỌC CHUẨN: VNR202</div>
+                    <h4>LỊCH SỬ ĐẢNG CỘNG SẢN VIỆT NAM — ĐẠI HỌC FPT</h4>
+                    <p className="curriculum-desc">
+                      Chương trình chuẩn gồm <strong>1 Chương nhập môn</strong> và <strong>3 Chương nội dung cốt lõi</strong>. Dự án là sản phẩm sáng tạo chuyên sâu của <strong>Chương 1</strong>:
+                    </p>
+                  </div>
+
+                  <span className="role-caption">VỊ TRÍ ĐỀ TÀI TRONG CẤU TRÚC 3 CHƯƠNG CỦA MÔN HỌC:</span>
+
+                  <div className="curriculum-chapters-list">
+                    {/* Nhập môn */}
+                    <div className="chapter-box">
+                      <div className="chapter-badge">Nhập môn</div>
+                      <div className="chapter-detail">
+                        <strong className="chapter-title">Đối tượng, chức năng, nhiệm vụ và phương pháp nghiên cứu môn học</strong>
+                        <p className="chapter-text">Trang bị thế giới quan khoa học, phương pháp lịch sử và phương pháp logic trong nghiên cứu lịch sử Đảng.</p>
+                      </div>
+                    </div>
+
+                    {/* Chương 1 - Trọng tâm */}
+                    <div className="chapter-box is-highlighted">
+                      <div className="chapter-badge highlight-badge">Chương 1 (1930 – 1945) ★ TRỌNG TÂM ĐỀ TÀI</div>
+                      <div className="chapter-detail">
+                        <strong className="chapter-title highlight-title">Đảng ra đời và lãnh đạo đấu tranh giành chính quyền (1930 – 1945)</strong>
+                        <div className="chapter-sub-points">
+                          <div>• Hoạt động của Nguyễn Ái Quốc và Hội nghị thành lập Đảng năm 1930.</div>
+                          <div>• Các phong trào cách mạng 1930 – 1931 và phong trào dân chủ 1936 – 1939.</div>
+                          <div className="target-sub-point">
+                            📍 <strong>Phạm vi số hóa trực tiếp của dự án:</strong> Phong trào giải phóng dân tộc (1939 – 1945) và Cách mạng Tháng Tám. Tái hiện chuyển hướng chỉ đạo chiến lược (Hội nghị TW 8 Pác Bó), khởi nghĩa từng phần (Bắc Sơn, Nam Kỳ, Đô Lương), thành lập Đội VNTTGPQ, Quốc dân Đại hội Tân Trào đến Tổng khởi nghĩa giành chính quyền ở Hà Nội, Huế, Sài Gòn và Tuyên ngôn Độc lập Ba Đình 02/09/1945.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Chương 2 */}
+                    <div className="chapter-box">
+                      <div className="chapter-badge">Chương 2 (1945 – 1975)</div>
+                      <div className="chapter-detail">
+                        <strong className="chapter-title">Đảng lãnh đạo hai cuộc kháng chiến (1945 – 1975)</strong>
+                        <p className="chapter-text">Kháng chiến chống thực dân Pháp kết thúc bằng Chiến thắng Điện Biên Phủ (1954); Kháng chiến chống đế quốc Mỹ giải phóng hoàn toàn miền Nam, thống nhất đất nước (1975).</p>
+                      </div>
+                    </div>
+
+                    {/* Chương 3 */}
+                    <div className="chapter-box">
+                      <div className="chapter-badge">Chương 3 (1975 – nay)</div>
+                      <div className="chapter-detail">
+                        <strong className="chapter-title">Đảng lãnh đạo cả nước đi lên CNXH và tiến hành công cuộc Đổi mới</strong>
+                        <p className="chapter-text">Xây dựng và bảo vệ Tổ quốc xã hội chủ nghĩa; đường lối đổi mới toàn diện đất nước từ Đại hội VI (1986) đến nay.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {infoTab === 'references' && (
+                <div className="tab-pane-content">
+                  <span className="role-caption">VĂN KIỆN & TÀI LIỆU LỊCH SỬ CHÍNH THỐNG:</span>
+                  <ul className="doc-reference-list">
+                    <li className="doc-item">
+                      <span className="doc-num">01</span>
+                      <div className="doc-content">
+                        <strong>Giáo trình Lịch sử Đảng Cộng sản Việt Nam (VNR202)</strong>
+                        <p>NXB Chính trị quốc gia Sự thật – Giáo trình chuẩn dành cho sinh viên Đại học FPT.</p>
+                      </div>
                     </li>
-                    <li>
-                      <strong>2. Văn kiện Đảng Toàn tập (Tập 7: 1940 – 1945)</strong>: Nghị quyết TW 6, TW 7, TW 8.
+                    <li className="doc-item">
+                      <span className="doc-num">02</span>
+                      <div className="doc-content">
+                        <strong>Văn kiện Đảng Toàn tập (Tập 7: 1940 – 1945)</strong>
+                        <p>Nghị quyết TW 6 (11/1939), TW 7 (11/1940), TW 8 (05/1941).</p>
+                      </div>
                     </li>
-                    <li>
-                      <strong>3. Chỉ thị "Nhật - Pháp bắn nhau và hành động của chúng ta"</strong> (12/03/1945).
+                    <li className="doc-item">
+                      <span className="doc-num">03</span>
+                      <div className="doc-content">
+                        <strong>Chỉ thị "Nhật - Pháp bắn nhau và hành động của chúng ta"</strong>
+                        <p>Ban Thường vụ Trung ương Đảng ra ngày 12/03/1945 tại Đình Bảng, Từ Sơn, Bắc Ninh.</p>
+                      </div>
                     </li>
-                    <li>
-                      <strong>4. Quân lệnh số 1</strong> (13/08/1945) & Tuyên ngôn Độc lập (02/09/1945).
+                    <li className="doc-item">
+                      <span className="doc-num">04</span>
+                      <div className="doc-content">
+                        <strong>Quân lệnh số 1 & Tuyên ngôn Độc lập (02/09/1945)</strong>
+                        <p>Ủy ban Khởi nghĩa toàn quốc ban bố đêm 13/08/1945 và Chủ tịch Hồ Chí Minh đọc tại Quảng trường Ba Đình.</p>
+                      </div>
                     </li>
-                    <li>
-                      <strong>5. Đại tướng Võ Nguyên Giáp</strong>: <em>Những năm tháng không thể nào quên</em>, NXB QĐND.
-                    </li>
-                    <li>
-                      <strong>6. Trần Dân Tiên</strong>: <em>Những mẩu chuyện về đời hoạt động của Hồ Chủ tịch</em>.
+                    <li className="doc-item">
+                      <span className="doc-num">05</span>
+                      <div className="doc-content">
+                        <strong>Hồi ký "Những năm tháng không thể nào quên"</strong>
+                        <p>Đại tướng Võ Nguyên Giáp, NXB Quân đội Nhân dân.</p>
+                      </div>
                     </li>
                   </ul>
                 </div>
               )}
+
             </div>
           </div>
         </div>
       )}
 
-      {/* 6. MODAL ÂM THANH */}
+      {/* 7. HỘP THOẠI MỜI BẬT NHẠC NỀN */}
       {showAudioPrompt && (
-        <div className="audio-prompt-backdrop">
-          <div className="audio-prompt-box">
-            <div className="audio-prompt-icon">🎺</div>
-            <h3>BẠN CÓ MUỐN BẬT NHẠC NỀN?</h3>
-            <p>Trải nghiệm khám phá bản đồ sẽ sống động và hào hùng hơn khi đi kèm âm thanh giai điệu cách mạng.</p>
-            <div className="audio-prompt-actions">
-              <button className="prompt-btn-allow" onClick={handleEnableAudio}>
-                🔊 Bật nhạc nền
+        <div className="heritage-audio-prompt-backdrop">
+          <div className="heritage-audio-prompt-card">
+            <div className="prompt-header-icon">🎺</div>
+            <h3 className="prompt-title">BẠN CÓ MUỐN BẬT NHẠC NỀN HÀO HÙNG?</h3>
+            <p className="prompt-desc">
+              Trải nghiệm khám phá các mốc son lịch sử sẽ sống động và trang trọng hơn với giai điệu bài ca cách mạng.
+            </p>
+            <div className="prompt-buttons-row">
+              <button className="prompt-confirm-btn" onClick={handleEnableAudio}>
+                🔊 Bật nhạc nền ngay
               </button>
-              <button className="prompt-btn-skip" onClick={() => setShowAudioPrompt(false)}>
+              <button className="prompt-dismiss-btn" onClick={() => setShowAudioPrompt(false)}>
                 🔇 Khám phá không âm thanh
               </button>
             </div>
