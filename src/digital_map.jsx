@@ -348,16 +348,16 @@ export default function HistoricalMap() {
     }
 
     const strictBounds = [
-      [4.5, 98.0],
-      [28.0, 122.0]
+      [5.0, 99.0],
+      [27.5, 121.0]
     ];
 
     const isMobile = window.innerWidth <= 768;
 
     const map = L.map(mapContainerRef.current, {
-      center: isMobile ? [14.2, 108.2] : [14.6, 108.8],
-      zoom: isMobile ? 4.6 : 5.15,
-      minZoom: isMobile ? 4.0 : 4.5,
+      center: isMobile ? [16.0, 107.5] : [16.2, 107.8],
+      zoom: isMobile ? 5.2 : 5.85,
+      minZoom: isMobile ? 4.8 : 5.5,
       maxZoom: 18,
       maxBounds: strictBounds,
       maxBoundsViscosity: 0.8,
@@ -436,8 +436,8 @@ export default function HistoricalMap() {
     });
 
     L.marker([16.5, 112.0], { icon: hoangSaBadge, interactive: false, zIndexOffset: 900 }).addTo(map);
-    L.marker([10.2, 114.2], { icon: truongSaBadge, interactive: false, zIndexOffset: 900 }).addTo(map);
-    L.marker([13.6, 112.6], { icon: bienDongBadge, interactive: false, zIndexOffset: 850 }).addTo(map);
+    L.marker([10.0, 114.2], { icon: truongSaBadge, interactive: false, zIndexOffset: 900 }).addTo(map);
+    L.marker([14.5, 112.2], { icon: bienDongBadge, interactive: false, zIndexOffset: 850 }).addTo(map);
 
     markersLayerRef.current = L.layerGroup().addTo(map);
 
@@ -703,7 +703,7 @@ export default function HistoricalMap() {
             <span className="emblem-star">★</span>
           </div>
           <div className="brand-text-block">
-            <h1 className="brand-main-title">BẢN ĐỒ MỐC SON LỊCH SỬ (1939 - 1945)</h1>
+            <h1 className="brand-main-title">GIÁO DỤC TÌNH YÊU QUÊ HƯƠNG ĐẤT NƯỚC (1939-1945)</h1>
             <p className="brand-sub-title">Sản phẩm sáng tạo VNR202 • Lịch sử Đảng Cộng sản Việt Nam (Đại học FPT)</p>
           </div>
         </div>
